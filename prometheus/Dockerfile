@@ -1,0 +1,3 @@
+ARG PROMETHEUS_TAG
+
+FROM prom/prometheus:$PROMETHEUS_TAG

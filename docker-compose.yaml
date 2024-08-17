@@ -1,0 +1,35 @@
+name: windows-monitoring
+
+services:
+  grafana:
+    image: grafana/grafana-enterprise:$GRAFANA_TAG
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+      args:
+        - GRAFANA_TAG=$GRAFANA_TAG
+    labels:
+      - $GRAFANA_TAG
+    restart: always
+    ports:
+      - "$HOST$GRAFANA_PORT:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana/configs/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/configs/ldap.toml:/etc/grafana/ldap.toml
+
+  prometheus:
+    image: prom/prometheus:$PROMETHEUS_TAG
+    build:
+      context: ./prometheus
+      dockerfile: Dockerfile
+      args:
+        - PROMETHEUS_TAG=$PROMETHEUS_TAG
+    labels:
+      - $PROMETHEUS_TAG
+    restart: always
+    ports:
+      - "$HOST$PROMETHEUS_PORT:9090"
+    volumes:
+      - ./prometheus/data:/prometheus
+      - ./prometheus/configs/prometheus.yml:/etc/prometheus/prometheus.yml
