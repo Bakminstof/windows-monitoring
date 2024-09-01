@@ -46,11 +46,11 @@ PUSHD %CURRENT_DIR%
 @SET "ENV_FILE=%CURRENT_DIR%config.env"
 @SET "COMPOSE_FILE=docker-compose.yaml"
 
-@REM CALL create-service.cmd -d
-@REM CALL create-containers.cmd -d
-@REM
-@REM CALL :print %NF_CAYN% "Start Grafana and Prometheus containers" Print_border
-@REM CALL :run_command docker-compose --env-file "%ENV_FILE%" -f "%COMPOSE_FILE%" up -d
+CALL create-service.cmd -d
+CALL create-containers.cmd -d
+
+CALL :print %NF_CAYN% "Start Grafana and Prometheus containers" Print_border
+CALL :run_command docker-compose --env-file "%ENV_FILE%" -f "%COMPOSE_FILE%" up -d
 
 @ECHO %SF_CAYN%Windows exporter%RESET% %NF_GREEN%=^>%RESET% %NF_CAYN%http://localhost:9182/metrics%RESET%
 @ECHO %SF_CAYN%Prometheus%RESET% %NF_GREEN%=^>%RESET% %NF_CAYN%http://localhost:9090/%RESET%
