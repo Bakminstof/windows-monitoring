@@ -3,6 +3,7 @@ name: windows-monitoring
 services:
   grafana:
     image: grafana/grafana-enterprise:$GRAFANA_TAG
+    container_name: wm_grafana
     build:
       context: ./grafana
       dockerfile: Dockerfile
@@ -20,6 +21,7 @@ services:
 
   prometheus:
     image: prom/prometheus:$PROMETHEUS_TAG
+    container_name: wm_prometheus
     build:
       context: ./prometheus
       dockerfile: Dockerfile

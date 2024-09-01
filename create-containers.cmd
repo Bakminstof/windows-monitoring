@@ -40,40 +40,26 @@ CHCP %ENCODING% > nul
 TITLE %SCRIPT_NAME%
 :: Start
 ::==============================================================================================================
-@SET "DOCKER_NAME=docker-compose"
-
-CALL :check_exsist %DOCKER_NAME%
-
 PUSHD %CURRENT_DIR%
 
 CALL :print %NF_CAYN% "Start create Grafana and Prometheus containers" Print_border
-CALL :run_command %DOCKER_NAME% --env-file %CURRENT_DIR%config.env -f docker-compose.yaml build
+CALL :run_command_with_line docker-compose --env-file %CURRENT_DIR%config.env -f docker-compose.yaml build
+
+CALL :print %NF_BLACK%%NB_CAYN% " DONE "
+
+IF [%~1] == [-d] (
+  @EXIT /B 0
+)  ELSE (
+  PAUSE > nul
+)
 
 POPD
 ::==============================================================================================================
 :: Stop
-CALL :print %NF_BLACK%%NB_CAYN% " DONE "
 
-TIMEOUT /T 10 > nul
-
-@EXIT
+@EXIT /B 0
 
 :: Functions
-:: Check util exists
-:check_exsist [util_name]
-WHERE %~1
-
-IF NOT %ERRORLEVEL% == 0 (
-  CALL :print %SF_RED% "Util: %~1 not found"
-
-  TIMEOUT /T 12 > nul
-
-  @EXIT 1
-)
-
-goto :eof
-
-:: Displaying colored text
 :print [color] [text] [if_border]
 SETLOCAL
 @SET "COLON=%SF_YELLOW%:%RESET%"
@@ -87,20 +73,35 @@ IF [%~3] == [] (
 ENDLOCAL
 goto :eof
 
-:: Running the received command
-:run_command [command]
-%*
-
+:check_error_level
 IF %ERRORLEVEL% == 0 (
   CALL :print %SF_GREEN% OK
 ) ELSE (
   CALL :print %SF_RED% Fail
 )
 
-CALL :print_line
 goto :eof
 
-:: Displaying a line of the specified length
+:run_command [command]
+%*
+
+CALL :check_error_level
+
+goto :eof
+
+:run_command_with_echo [command]
+@ECHO %NF_BLACK%%NB_WHITE%Run command:%RESET% %*
+
+CALL :run_command %*
+
+goto :eof
+
+:run_command_with_line [command]
+CALL :run_command %*
+CALL :print_line
+
+goto :eof
+
 :print_line [length]
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
@@ -119,4 +120,14 @@ FOR /L %%i in (1,1,%LENGTH%) DO (
 CALL :print %SF_YELLOW% %LINE%
 
 ENDLOCAL
+goto :eof
+
+:check_exists [file]
+
+IF NOT EXIST %~1 (
+  CALL :print %SF_RED% "Error. Не могу найти `%~1`"
+  TIMEOUT /T 6 > nul
+  @EXIT 1
+)
+
 goto :eof
